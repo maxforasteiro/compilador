@@ -2,3 +2,5 @@ util.o
 main.o
 cminus
 test.o
+lex.yy.c
+cminus
