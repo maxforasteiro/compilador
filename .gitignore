@@ -4,3 +4,4 @@ cminus
 test.o
 lex.yy.c
 cminus
+lex.yy.o
