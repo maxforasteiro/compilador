@@ -49,7 +49,7 @@ whitespace  [ \t\r]+
                   do {
                     cant = c;
                     c = input();
-                    if (c == EOF) return ERROR;
+                    if (c == EOF || c == 0) return ERROR;
                     if (c == '\n') lineno++;
                   } while (c != '/' || cant != '*');
                 }
