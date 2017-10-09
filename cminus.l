@@ -1,10 +1,12 @@
 %{
+
 #include "globals.h"
 #include "util.h"
 #include "scan.h"
 /* lexeme of identifier or reserved word */
 char tokenString[MAXTOKENLEN+1];
 static int yylex(void);
+
 %}
 
 digit       [0-9]
@@ -16,35 +18,35 @@ whitespace  [ \t\r]+
 
 %%
 
-"if"            {return IF;}
-"else"          {return ELSE;}
-"void"          {return VOID;}
-"int"           {return INT;}
-"return"        {return RETURN;}
-"while"         {return WHILE;}
-"="             {return ASSIGN;}
-"=="            {return EQ;}
-"!="            {return NEQ;}
-"<"             {return LT;}
-"<="            {return LET;}
-">"             {return GT;}
-">="            {return GET;}
-"+"             {return PLUS;}
-"-"             {return MINUS;}
-"*"             {return TIMES;}
-"/"             {return OVER;}
-","             {return COMMA;}
-"("             {return LPAREN;}
-")"             {return RPAREN;}
-"["             {return LBRACKET;}
-"]"             {return RBRACKET;}
-"{"             {return LBRACE;}
-"}"             {return RBRACE;}
-";"             {return SEMI;}
-{number}        {return NUM;}
-{identifier}    {return ID;}
-{newline}       {lineno++;}
-{whitespace}    {/* skip whitespace */}
+"if"            { return IF; }
+"else"          { return ELSE; }
+"void"          { return VOID; }
+"int"           { return INT; }
+"return"        { return RETURN; }
+"while"         { return WHILE; }
+"="             { return ASSIGN; }
+"=="            { return EQ; }
+"!="            { return NEQ; }
+"<"             { return LT; }
+"<="            { return LET; }
+">"             { return GT; }
+">="            { return GET; }
+"+"             { return PLUS; }
+"-"             { return MINUS; }
+"*"             { return TIMES; }
+"/"             { return OVER; }
+","             { return COMMA; }
+"("             { return LPAREN; }
+")"             { return RPAREN; }
+"["             { return LBRACKET; }
+"]"             { return RBRACKET; }
+"{"             { return LBRACE; }
+"}"             { return RBRACE; }
+";"             { return SEMI; }
+{number}        { return NUM; }
+{identifier}    { return ID; }
+{newline}       { lineno++; }
+{whitespace}    { /* skip whitespace */ }
 "/*"            { char c = ' ', cant = ' ';
                   do {
                     cant = c;
@@ -53,7 +55,7 @@ whitespace  [ \t\r]+
                     if (c == '\n') lineno++;
                   } while (c != '/' || cant != '*');
                 }
-.               {return ERROR;}
+.               { return ERROR; }
 
 %%
 
