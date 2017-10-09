@@ -1,6 +1,6 @@
 /****************************************************/
 /* File: globals.h                                  */
-/* Global types and vars for TINY compiler          */
+/* Global types and vars for C- compiler            */
 /* must come before other include files             */
 /* Compiler Construction: Principles and Practice   */
 /* Kenneth C. Louden                                */
@@ -25,7 +25,7 @@
 /* MAXRESERVED = the number of reserved words */
 #define MAXRESERVED 8
 
-typedef enum 
+typedef enum
     /* book-keeping tokens */
    {ENDFILE,ERROR,
     /* reserved words */
@@ -103,5 +103,5 @@ extern int TraceAnalyze;
 extern int TraceCode;
 
 /* Error = TRUE prevents further passes if an error occurs */
-extern int Error; 
+extern int Error;
 #endif
