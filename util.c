@@ -139,7 +139,7 @@ void printTree( TreeNode * tree ) {
           fprintf(listing,"Return\n");
           break;
         case AssignK: //Check this guy
-          fprintf(listing,"Assign to: %s\n", tree->attr.name);
+          fprintf(listing,"Assign\n");
           break;
         case CallK:
           fprintf(listing,"Call: %s\n", tree->attr.name);
@@ -151,7 +151,7 @@ void printTree( TreeNode * tree ) {
           fprintf(listing,"Function: %s\n", tree->attr.name);
           break;
         case VectorK:
-          fprintf(listing, "Vector: %s\n", tree->attr.name);
+          fprintf(listing, "Vector: %s[%d]\n", tree->attr.name, tree->attr.length);
           break;
         default:
           fprintf(listing,"Unknown StmtNode kind\n");

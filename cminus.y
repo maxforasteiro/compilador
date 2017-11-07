@@ -115,7 +115,7 @@ param       : type id
               {
                 $$ = $1;
                 $$->child[0] = $2;
-                $2->kind.exp = VectorK;
+                $2->kind.exp = VectorIdK;
               }
             ;
 
@@ -196,8 +196,8 @@ selc_decl   : IF LPAREN expression RPAREN statement
 iter_decl   : WHILE LPAREN expression RPAREN statement
               {
                 $$ = newStmtNode(WhileK);
-                $$->child[0] = $2;
-                $$->child[1] = $4;
+                $$->child[0] = $3;
+                $$->child[1] = $5;
               }
             ;
 
@@ -225,7 +225,7 @@ var         : id { $$ = $1; }
             | id LBRACKET expression RBRACKET
               {
                 $$ = $1;
-                $$->kind.exp = VectorK;
+                $$->kind.exp = VectorIdK;
                 $$->child[0] = $3;
               }
             ;

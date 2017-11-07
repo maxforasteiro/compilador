@@ -1,5 +1,5 @@
-int t[1];
-int gdc (int u, int v) {
+int t;
+int gdc (int u[], int v) {
    /* teste de selecao, expressores, return e chamada de funcao */
    if (v == 0) return u;
    else return gdc(v,u-u/v*v);
@@ -39,7 +39,4 @@ void main(void) {
 
    /* teste return simples */
    return;
-
-/* erro lexico 2: nao esta fechando o comentario */
-
 }
