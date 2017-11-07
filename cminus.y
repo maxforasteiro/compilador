@@ -366,9 +366,9 @@ num         : NUM
 %%
 
 int yyerror(char * message) {
-  fprintf(listing,"Syntax error at line %d: %s\n",lineno,message);
-  fprintf(listing,"Current token: ");
-  printToken(yychar,tokenString);
+  fprintf(listing, "Syntax error at line %d: %s\n", lineno, message);
+  fprintf(listing, "Current token: ");
+  printToken(yychar, tokenString);
   Error = TRUE;
   return 0;
 }

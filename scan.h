@@ -1,8 +1,7 @@
 /****************************************************/
 /* File: scan.h                                     */
 /* The scanner interface for the C- compiler        */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
+/* Max Forasteiro                                   */
 /****************************************************/
 
 #ifndef _SCAN_H_
@@ -12,7 +11,7 @@
 #define MAXTOKENLEN 40
 
 /* tokenString array stores the lexeme of each token */
-extern char tokenString[MAXTOKENLEN+1];
+extern char tokenString[MAXTOKENLEN + 1];
 
 /* function getToken returns the
  * next token in source file

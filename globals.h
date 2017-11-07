@@ -3,8 +3,7 @@
 /* Yacc/Bison Version                               */
 /* Global types and vars for C- compiler            */
 /* must come before other include files             */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
+/* Max Forasteiro                                   */
 /****************************************************/
 
 #ifndef _GLOBALS_H_

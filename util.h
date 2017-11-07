@@ -1,8 +1,7 @@
 /****************************************************/
 /* File: util.h                                     */
 /* Utility functions for the C- compiler            */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
+/* Max Forasteiro                                   */
 /****************************************************/
 
 #ifndef _UTIL_H_

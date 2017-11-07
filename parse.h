@@ -2,8 +2,7 @@
 /****************************************************/
 /* File: parse.h                                    */
 /* The parser interface for the C- compiler         */
-/* Compiler Construction: Principles and Practice   */
-/* Kenneth C. Louden                                */
+/* Max Forasteiro                                   */
 /****************************************************/
 
 #ifndef _PARSE_H_

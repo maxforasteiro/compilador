@@ -18,36 +18,37 @@ whitespace  [ \t\r]+
 
 %%
 
-"if"            { return IF; }
-"else"          { return ELSE; }
-"void"          { return VOID; }
-"int"           { return INT; }
-"return"        { return RETURN; }
-"while"         { return WHILE; }
-"="             { return ASSIGN; }
-"=="            { return EQ; }
-"!="            { return NEQ; }
-"<"             { return LT; }
-"<="            { return LET; }
-">"             { return GT; }
-">="            { return GET; }
-"+"             { return PLUS; }
-"-"             { return MINUS; }
-"*"             { return TIMES; }
-"/"             { return OVER; }
-","             { return COMMA; }
-"("             { return LPAREN; }
-")"             { return RPAREN; }
-"["             { return LBRACKET; }
-"]"             { return RBRACKET; }
-"{"             { return LBRACE; }
-"}"             { return RBRACE; }
-";"             { return SEMI; }
-{number}        { return NUM; }
-{identifier}    { return ID; }
-{newline}       { lineno++; }
+"if"            { return IF;            }
+"else"          { return ELSE;          }
+"void"          { return VOID;          }
+"int"           { return INT;           }
+"return"        { return RETURN;        }
+"while"         { return WHILE;         }
+"="             { return ASSIGN;        }
+"=="            { return EQ;            }
+"!="            { return NEQ;           }
+"<"             { return LT;            }
+"<="            { return LET;           }
+">"             { return GT;            }
+">="            { return GET;           }
+"+"             { return PLUS;          }
+"-"             { return MINUS;         }
+"*"             { return TIMES;         }
+"/"             { return OVER;          }
+","             { return COMMA;         }
+"("             { return LPAREN;        }
+")"             { return RPAREN;        }
+"["             { return LBRACKET;      }
+"]"             { return RBRACKET;      }
+"{"             { return LBRACE;        }
+"}"             { return RBRACE;        }
+";"             { return SEMI;          }
+{number}        { return NUM;           }
+{identifier}    { return ID;            }
+{newline}       { lineno++;             }
 {whitespace}    { /* skip whitespace */ }
-"/*"            { char c = ' ', cant = ' ';
+"/*"            {
+                  char c = ' ', cant = ' ';
                   do {
                     cant = c;
                     c = input();
@@ -55,7 +56,7 @@ whitespace  [ \t\r]+
                     if (c == '\n') lineno++;
                   } while (c != '/' || cant != '*');
                 }
-.               { return ERROR; }
+.               { return ERROR;      }
 
 %%
 
@@ -69,10 +70,10 @@ TokenType getToken(void) {
     yyout = listing;
   }
   currentToken = yylex();
-  strncpy(tokenString,yytext,MAXTOKENLEN);
+  strncpy(tokenString, yytext, MAXTOKENLEN);
   if (TraceScan) {
-    fprintf(listing,"\t%d: ",lineno);
-    printToken(currentToken,tokenString);
+    fprintf(listing, "\t%d: ",l ineno);
+    printToken(currentToken, tokenString);
   }
   return currentToken;
 }

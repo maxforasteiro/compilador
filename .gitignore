@@ -5,3 +5,6 @@ test.o
 lex.yy.c
 cminus
 lex.yy.o
+cminus.tab.c
+cminus.tab.h
+cminus.tab.o
