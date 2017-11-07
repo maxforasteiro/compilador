@@ -171,7 +171,7 @@ void printTree( TreeNode * tree ) {
           fprintf(listing,"Id: %s\n", tree->attr.name);
           break;
         case VectorIdK:
-          fprintf(listing, "Vector index: %d\n", tree->attr.length);
+          fprintf(listing, "Vector: %s\n", tree->attr.name);
           break;
         case TypeK:
           fprintf(listing, "Type: %s\n", tree->attr.name);
