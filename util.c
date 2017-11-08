@@ -137,7 +137,7 @@ void printTree( TreeNode * tree ) {
         case ReturnK:
           fprintf(listing, "Return\n");
           break;
-        case AssignK: //Check this guy
+        case AssignK:
           fprintf(listing, "Assign\n");
           break;
         case CallK:
@@ -180,9 +180,10 @@ void printTree( TreeNode * tree ) {
           break;
       }
     }
-    else fprintf(listing, "Unknown node kind\n");
+    else
+      fprintf(listing, "Unknown node kind\n");
     for (i = 0; i < MAXCHILDREN; i++)
-         printTree(tree->child[i]);
+      printTree(tree->child[i]);
     tree = tree->sibling;
   }
   UNINDENT;
