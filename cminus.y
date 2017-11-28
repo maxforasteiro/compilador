@@ -171,7 +171,6 @@ statement   : expr_decl { $$ = $1; }
             | selc_decl { $$ = $1; }
             | iter_decl { $$ = $1; }
             | retr_decl { $$ = $1; }
-            | error     { $$ = NULL; }
             ;
 
 expr_decl   : expression SEMI { $$ = $1; }
