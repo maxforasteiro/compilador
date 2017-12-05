@@ -56,7 +56,7 @@ whitespace  [ \t\r]+
                     if (c == '\n') lineno++;
                   } while (c != '/' || cant != '*');
                 }
-.               { return ERROR;      }
+.               { return ERROR; }
 
 %%
 
