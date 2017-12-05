@@ -16,10 +16,10 @@
 /* the list of line numbers of the source
  * code in which a variable is referenced
  */
-typedef struct LineListRec
-   { int lineno;
-     struct LineListRec * next;
-   } * LineList;
+typedef struct LineListRec {
+  int lineno;
+  struct LineListRec *next;
+} *LineList;
 
 /* The record in the bucket lists for
  * each variable, including name,
@@ -27,21 +27,21 @@ typedef struct LineListRec
  * the list of line numbers in which
  * it appears in the source code
  */
-typedef struct BucketListRec
-   { char * name;
-     LineList lines;
-     TreeNode *treeNode;
-     int memloc ; /* memory location for variable */
-     struct BucketListRec * next;
-   } * BucketList;
+typedef struct BucketListRec {
+  char *name;
+  LineList lines;
+  TreeNode *treeNode;
+  int memloc ; /* memory location for variable */
+  struct BucketListRec *next;
+} *BucketList;
 
 
-typedef struct ScopeRec
-   { char * funcName;
-     int nestedLevel;
-     struct ScopeRec * parent;
-     BucketList hashTable[SIZE]; /* the hash table */
-   } * Scope;
+typedef struct ScopeRec {
+  char *funcName;
+  int nestedLevel;
+  struct ScopeRec *parent;
+  BucketList hashTable[SIZE]; /* the hash table */
+} *Scope;
 
 
 Scope globalScope;
@@ -51,27 +51,27 @@ Scope globalScope;
  * loc = memory location is inserted only the
  * first time, otherwise ignored
  */
-void st_insert( char * name, int lineno, int loc, TreeNode * treeNode );
+void st_insert(char *name, int lineno, int loc, TreeNode *treeNode);
 
 /* Function st_lookup returns the memory
  * location of a variable or -1 if not found
  */
-int st_lookup ( char * name );
-int st_add_lineno(char * name, int lineno);
-BucketList st_bucket( char * name );
-int st_lookup_top (char * name);
+int st_lookup (char *name);
+int st_add_lineno(char *name, int lineno);
+BucketList st_bucket(const char *name);
+int st_lookup_top (char *name);
 
 Scope sc_create(char *funcName);
-Scope sc_top( void );
-void sc_pop( void );
-void sc_push( Scope scope );
-int addLocation( void );
+Scope sc_top(void);
+void sc_pop(void);
+void sc_push(Scope scope);
+int addLocation(void);
 
 
 /* Procedure printSymTab prints a formatted
  * listing of the symbol table contents
  * to the listing file
  */
-void printSymTab(FILE * listing);
+void printSymTab(FILE *listing);
 
 #endif
