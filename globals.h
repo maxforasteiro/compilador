@@ -62,22 +62,49 @@ extern int lineno; /* source line number for listing */
 /***********   Syntax tree for parsing ************/
 /**************************************************/
 
-typedef enum { StmtK, ExpK } NodeKind;
-typedef enum { IfK, WhileK, ReturnK, AssignK, CallK, VarK, FuncK, VectorK } StmtKind;
-typedef enum { OpK, ConstK, IdK, VectorIdK, TypeK } ExpKind;
+typedef enum { StmtK, ExpK, DeclK, ParamK, TypeK } NodeKind;
+typedef enum { CompK, IfK, WhileK, ReturnK } StmtKind;
+typedef enum { AssignK, OpK, ConstK, IdK, VectorIdK, CallK } ExpKind;
+typedef enum { FuncK, VarK, VectorVarK } DeclKind;
+typedef enum { VectorParamK, NonVectorParamK } ParamKind;
+typedef enum { TypeNameK } TypeKind;
 
 /* ExpType is used for type checking */
-typedef enum { Void, Integer, Boolean } ExpType;
+typedef enum { Void, Integer, Boolean, IntegerArray } ExpType;
+
+/* Vector attribute structure */
+typedef struct vectorAttr {
+  TokenType type;
+  char *name;
+  int size;
+} VectorAttr;
 
 #define MAXCHILDREN 3
 
+struct ScopeRec;
+
 typedef struct treeNode {
-  struct treeNode * child[MAXCHILDREN];
-  struct treeNode * sibling;
+  struct treeNode *child[MAXCHILDREN];
+  struct treeNode *sibling;
   int lineno;
   NodeKind nodekind;
-  union { StmtKind stmt; ExpKind exp; } kind;
-  struct { TokenType op; int val; int length; char * name; } attr;
+  union {
+    StmtKind stmt;
+    ExpKind exp;
+    DeclKind decl;
+    ParamKind param;
+    TypeKind type;
+  } kind;
+
+  union {
+    TokenType op;
+    TokenType type;
+    int val;
+    char *name;
+    VectorAttr vector;
+    struct ScopeRec *scope;
+  } attr;
+
   ExpType type; /* for type checking of exps */
 } TreeNode;
 
