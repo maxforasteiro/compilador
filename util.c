@@ -197,6 +197,7 @@ void printTree(TreeNode *tree) {
       switch (tree->kind.stmt) {
         case CompK:
           fprintf(listing, "Compound statement\n");
+          break;
         case IfK:
           fprintf(listing, "If\n");
           break;
@@ -214,7 +215,7 @@ void printTree(TreeNode *tree) {
     else if (tree->nodekind == ExpK) {
       switch (tree->kind.exp) {
         case AssignK:
-          fprintf(listing, "Assign: \n");
+          fprintf(listing, "Assign:\n");
           break;
         case OpK:
           fprintf(listing, "Op: ");
