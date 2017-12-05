@@ -14,7 +14,7 @@
 /* set NO_CODE to TRUE to get a compiler that does not
  * generate code
  */
-#define NO_CODE FALSE
+#define NO_CODE TRUE
 
 #include "util.h"
 #if NO_PARSE
@@ -31,21 +31,21 @@
 
 /* allocate global variables */
 int lineno = 0;
-FILE * source;
-FILE * listing;
-FILE * code;
+FILE *source;
+FILE *listing;
+FILE *code;
 
 /* allocate and set tracing flags */
-int EchoSource = FALSE;
-int TraceScan = FALSE;
-int TraceParse = FALSE;
-int TraceAnalyze = FALSE;
-int TraceCode = TRUE;
+int EchoSource   = TRUE;
+int TraceScan    = TRUE;
+int TraceParse   = TRUE;
+int TraceAnalyze = TRUE;
+int TraceCode    = FALSE;
 
-int Error = FALSE;
+int Error        = TRUE;
 
-int main( int argc, char * argv[] ) {
-  TreeNode * syntaxTree;
+int main(int argc, char *argv[]) {
+  TreeNode *syntaxTree;
   char pgm[120]; /* source code file name */
   if (argc != 2) {
     fprintf(stderr, "usage: %s <filename>\n", argv[0]);
