@@ -8,11 +8,12 @@
 #include "parse.h"
 
 #define YYSTYPE TreeNode *
-static char * savedName; /* for use in assignments */
+static char *savedName; /* for use in assignments */
+static int savedNumber;
 static int savedLineNo;  /* ditto */
-static TreeNode * savedTree; /* stores syntax tree for later return */
+static TreeNode *savedTree; /* stores syntax tree for later return */
 static int yylex(void);
-int yyerror(char * message);
+int yyerror(char *message);
 
 %}
 
@@ -23,10 +24,10 @@ int yyerror(char * message);
 
 %% /* Grammar for C- */
 
-program     : list_decl { savedTree = $1; }
+program     : decl_list { savedTree = $1; }
             ;
 
-list_decl   : list_decl decl
+decl_list   : decl_list decl
               {
                 YYSTYPE t = $1;
                 if(t != NULL){
@@ -36,59 +37,79 @@ list_decl   : list_decl decl
                   $$ = $1;
                 }
                 else
-                  $$ = $1;
+                  $$ = $2;
               }
             | decl { $$ = $1; }
             ;
 
-decl        : var_decl { $$ = $1; }
+decl        : var_decl  { $$ = $1; }
             | func_decl { $$ = $1; }
             ;
 
-var_decl    : type id SEMI
+save_name   : ID
               {
-                $$ = $1;
-                $$->child[0] = $2;
-                $2->nodekind = StmtK;
-                $2->kind.stmt = VarK;
+                savedName = copyString(tokenString);
+                savedLineNo = lineno;
               }
-            | type id LBRACKET num RBRACKET SEMI
+            ;
+
+save_number : NUM
               {
-                $$ = $1;
-                $$->child[0] = $2;
-                $2->nodekind = StmtK;
-                $2->kind.stmt = VectorK;
-                $2->attr.length = $4->attr.val;
+                savedNumber = atoi(tokenString);
+                savedLineNo = lineno;
+              }
+            ;
+
+var_decl    : type save_name SEMI
+              {
+                $$ = newDeclNode(VarK);
+                $$->child[0] = $1;
+                $$->lineno = lineno;
+                $$->attr.name = savedName;
+              }
+            | type save_name LBRACKET save_number RBRACKET SEMI
+              {
+                $$ = newDeclNode(VectorVarK);
+                $$->child[0] = $1;
+                $$->lineno = lineno;
+                $$->attr.vector.name = savedName;
+                $$->attr.vector.size = savedNumber;
               }
             ;
 
 type        : INT
               {
-                $$ = newExpNode(TypeK);
-                $$->type = Integer;
-                $$->attr.name = "Integer";
+                $$ = newTypeNode(TypeNameK);
+                $$->attr.type = INT;
               }
             | VOID
               {
-                $$ = newExpNode(TypeK);
-                $$->type = Void;
-                $$->attr.name = "Void";
+                $$ = newExpNode(TypeNameK);
+                $$->attr.type = VOID;
               }
             ;
 
-func_decl   : type id LPAREN params RPAREN comp_decl
+func_decl   : type save_name
               {
-                $$ = $1;
-                $$->child[0] = $2;
-                $2->nodekind = StmtK;
-                $2->kind.stmt = FuncK;
-                $2->child[0] = $4;
-                $2->child[1] = $6;
+                $$ = newDeclNode(FuncK);
+                $$->lineno = lineno;
+                $$->attr.name = savedName;
+              }
+              LPAREN params RPAREN comp_stmt
+              {
+                $$ = $3;           //?????????
+                $$->child[0] = $1; //?????????
+                $$->child[1] = $5; //?????????
+                $$->child[2] = $7; //?????????
               }
             ;
 
 params      : params_list { $$ = $1; }
-            | VOID {  }
+            | VOID
+            {
+              $$ = newTypeNode(TypeNameK);
+              $$->attr.type = VOID;
+            }
             ;
 
 params_list : params_list COMMA param
@@ -106,34 +127,26 @@ params_list : params_list COMMA param
             | param { $$ = $1; }
             ;
 
-param       : type id
+param       : type save_name
               {
-                $$ = $1;
-                $$->child[0] = $2;
+                $$ = newParamNode(NonVectorParamK);
+                $$->child[0] = $1;
+                $$->attr.name = savedName;
               }
-            | type id LBRACKET RBRACKET
+            | type save_name LBRACKET RBRACKET
               {
-                $$ = $1;
-                $$->child[0] = $2;
-                $2->kind.exp = VectorIdK;
+                $$ = newParamNode(VectorParamK);
+                $$->child[0] = $1;
+                $$->attr.name = savedName;
               }
             ;
 
-comp_decl   : LBRACE local_decl state_list RBRACE
+comp_stmt   : LBRACE local_decl stmt_list RBRACE
               {
-                YYSTYPE t = $2;
-                if(t != NULL) {
-                  while(t->sibling != NULL)
-                    t = t->sibling;
-                  t->sibling = $3;
-                  $$ = $2;
-                }
-                else
-                  $$ = $3;
+                $$ = newStmtNode(CompK);
+                $$->child[0] = $2;
+                $$->child[1] = $3;
               }
-            | LBRACE local_decl RBRACE { $$ = $2; }
-            | LBRACE state_list RBRACE { $$ = $2; }
-            | LBRACE  RBRACE {  }
             ;
 
 local_decl  : local_decl var_decl
@@ -148,10 +161,10 @@ local_decl  : local_decl var_decl
                 else
                   $$ = $2;
               }
-            | var_decl { $$ = $1; }
+            | /* empty */ { $$ = NULL; }
             ;
 
-state_list  : state_list statement
+stmt_list   : stmt_list stmt
               {
                 YYSTYPE t = $1;
                 if(t != NULL) {
@@ -163,27 +176,28 @@ state_list  : state_list statement
                 else
                   $$ = $2;
               }
-            | statement { $$ = $1; }
+            | /* empty */ { $$ = NULL; }
             ;
 
-statement   : expr_decl { $$ = $1; }
-            | comp_decl { $$ = $1; }
-            | selc_decl { $$ = $1; }
-            | iter_decl { $$ = $1; }
-            | retr_decl { $$ = $1; }
+stmt        : expr_stmt { $$ = $1; }
+            | comp_stmt { $$ = $1; }
+            | selc_stmt { $$ = $1; }
+            | iter_stmt { $$ = $1; }
+            | retr_stmt { $$ = $1; }
             ;
 
-expr_decl   : expression SEMI { $$ = $1; }
-            | SEMI {  }
+expr_stmt   : expression SEMI { $$ = $1; }
+            | SEMI { $$ = NULL; }
             ;
 
-selc_decl   : IF LPAREN expression RPAREN statement
+selc_stmt   : IF LPAREN expression RPAREN stmt
               {
                 $$ = newStmtNode(IfK);
                 $$->child[0] = $3;
                 $$->child[1] = $5;
+                $$->child[2] = NULL;
               }
-            | IF LPAREN expression RPAREN statement ELSE statement
+            | IF LPAREN expression RPAREN stmt ELSE stmt
               {
                 $$ = newStmtNode(IfK);
                 $$->child[0] = $3;
@@ -192,7 +206,7 @@ selc_decl   : IF LPAREN expression RPAREN statement
               }
             ;
 
-iter_decl   : WHILE LPAREN expression RPAREN statement
+iter_stmt   : WHILE LPAREN expression RPAREN stmt
               {
                 $$ = newStmtNode(WhileK);
                 $$->child[0] = $3;
@@ -200,9 +214,10 @@ iter_decl   : WHILE LPAREN expression RPAREN statement
               }
             ;
 
-retr_decl   : RETURN SEMI
+retr_stmt   : RETURN SEMI
               {
                 $$ = newStmtNode(ReturnK);
+                $$->child[0] = NULL;
               }
             | RETURN expression SEMI
               {
@@ -213,18 +228,22 @@ retr_decl   : RETURN SEMI
 
 expression  : var ASSIGN expression
               {
-                $$ = newStmtNode(AssignK);
+                $$ = newExpNode(AssignK);
                 $$->child[0] = $1;
                 $$->child[1] = $3;
               }
             | simple_exp { $$ = $1; }
             ;
 
-var         : id { $$ = $1; }
-            | id LBRACKET expression RBRACKET
+var         : save_name
               {
-                $$ = $1;
-                $$->kind.exp = VectorIdK;
+                $$ = newExpNode(IdK);
+                $$->attr.name = savedName;
+              }
+            | save_name LBRACKET expression RBRACKET
+              {
+                $$ = newExpNode(VectorIdK);
+                $$->attr.name = savedName;
                 $$->child[0] = $3;
               }
             ;
@@ -315,25 +334,28 @@ mult        : TIMES
 fact        : LPAREN expression RPAREN { $$ = $2; }
             | var { $$ = $1; }
             | call_func { $$ = $1; }
-            | num { $$ = $1; }
+            | NUM
+              {
+                $$ = newExpNode(ConstK);
+                $$->attr.val = atoi(tokenString);
+              }
             ;
 
-call_func   : id LPAREN RPAREN
+call_func   : save_name LPAREN RPAREN
               {
-                $$ = $1;
-                $$->nodekind = StmtK;
-                $$->kind.stmt = CallK;
+                $$ = newExpNode(CallK);
+                $$->attr.name = savedName;
+                $$->child[0] = NULL;
               }
-            | id LPAREN list_arg RPAREN
+            | save_name LPAREN arg_list RPAREN
               {
-                $$ = $1;
-                $$->nodekind = StmtK;
-                $$->kind.stmt = CallK;
+                $$ = newExpNode(CallK);
+                $$->attr.name = savedName;
                 $$->child[0] = $3;
               }
             ;
 
-list_arg    : list_arg COMMA expression
+arg_list    : arg_list COMMA expression
               {
                 YYSTYPE t = $1;
                 if(t != NULL) {
@@ -348,19 +370,6 @@ list_arg    : list_arg COMMA expression
             | expression { $$ = $1; }
             ;
 
-id          : ID
-              {
-                $$ = newExpNode(IdK);
-                $$->attr.name = copyString(tokenString);
-              }
-            ;
-
-num         : NUM
-              {
-                $$ = newExpNode(ConstK);
-                $$->attr.val = atoi(tokenString);
-              }
-            ;
 
 %%
 
