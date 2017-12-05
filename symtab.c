@@ -21,7 +21,7 @@
 #define MAX_SCOPE 1000
 
 /* the hash function */
-static int hash (const char *key) {
+static int hash(const char *key) {
   int temp = 0;
   int i = 0;
   while (key[i] != '\0') {
@@ -42,7 +42,6 @@ Scope sc_top(void) {
 }
 
 void sc_pop(void) {
-  //printf("pop %s\n", sc_top()->funcName);
   --nScopeStack;
 }
 
@@ -53,7 +52,6 @@ int addLocation(void) {
 void sc_push(Scope scope) {
   scopeStack[nScopeStack] = scope;
   location[nScopeStack++] = 0;
-  //printf("push %s\n", scope->funcName);
 }
 
 Scope sc_create(char *funcName) {
@@ -74,7 +72,7 @@ BucketList st_bucket(const char *name) {
   Scope sc = sc_top();
   while(sc) {
     BucketList l = sc->hashTable[h];
-    while ((l != NULL) && (strcmp(name,l->name) != 0))
+    while ((l != NULL) && (strcmp(name, l->name) != 0))
       l = l->next;
     if (l != NULL)
       return l;
@@ -126,7 +124,7 @@ int st_lookup_top(char *name) {
   Scope sc = sc_top();
   while(sc) {
     BucketList l = sc->hashTable[h];
-    while ((l != NULL) && (strcmp(name,l->name) != 0))
+    while ((l != NULL) && (strcmp(name, l->name) != 0))
       l = l->next;
     if (l != NULL)
       return l->memloc;
@@ -148,7 +146,7 @@ int st_add_lineno(char *name, int lineno) {
 void printSymTabRows(BucketList *hashTable, FILE *listing) {
   int j;
 
-  for (j=0;j<SIZE;++j) {
+  for (j = 0; j < SIZE; ++j) {
     if (hashTable[j] != NULL) {
       BucketList l = hashTable[j];
       TreeNode *node = l->treeNode;
@@ -168,7 +166,7 @@ void printSymTabRows(BucketList *hashTable, FILE *listing) {
                 fprintf(listing, "Variable  ");
                 break;
               case VectorVarK:
-                fprintf(listing, "Array Var.");
+                fprintf(listing, "Vector V  ");
                 break;
               default:
                 break;
@@ -180,7 +178,7 @@ void printSymTabRows(BucketList *hashTable, FILE *listing) {
                 fprintf(listing, "Variable  ");
                 break;
               case VectorParamK:
-                fprintf(listing, "Array Var.");
+                fprintf(listing, "Vector V  ");
                 break;
               default:
                 break;
@@ -196,6 +194,9 @@ void printSymTabRows(BucketList *hashTable, FILE *listing) {
             break;
           case Integer:
             fprintf(listing, "Integer      ");
+            break;
+          case IntegerArray:
+            fprintf(listing, "IntegerArray ");
             break;
           case Boolean:
             fprintf(listing, "Boolean      ");

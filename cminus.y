@@ -97,10 +97,10 @@ func_decl   : type save_name
               }
               LPAREN params RPAREN comp_stmt
               {
-                $$ = $3;           //?????????
-                $$->child[0] = $1; //?????????
-                $$->child[1] = $5; //?????????
-                $$->child[2] = $7; //?????????
+                $$ = $3;
+                $$->child[0] = $1;
+                $$->child[1] = $5;
+                $$->child[2] = $7;
               }
             ;
 
@@ -139,6 +139,7 @@ param       : type save_name
                 $$->child[0] = $1;
                 $$->attr.name = savedName;
               }
+            | /* empty */ { $$ = NULL; }
             ;
 
 comp_stmt   : LBRACE local_decl stmt_list RBRACE
@@ -251,6 +252,7 @@ var         : save_name
 simple_exp  : sum_exp relation sum_exp
               {
                 $$ = $2;
+                $$->type = Boolean;
                 $$->child[0] = $1;
                 $$->child[1] = $3;
               }
@@ -292,6 +294,7 @@ relation    : EQ
 sum_exp     : sum_exp sum term
               {
                 $$ = $2;
+                $$->type = Integer;
                 $$->child[0] = $1;
                 $$->child[1] = $3;
               }
@@ -313,6 +316,7 @@ sum         : PLUS
 term        : term mult fact
               {
                 $$ = $2;
+                $$->type = Integer;
                 $$->child[0] = $1;
                 $$->child[1] = $3;
               }

@@ -12,6 +12,7 @@
 
 static char *funcName;
 static int preserveLastScope = FALSE;
+int main_count = 0;
 
 /* counter for variable memory locations */
 
@@ -123,10 +124,18 @@ static void insertNode( TreeNode *t) {
       switch (t->kind.exp) {
         case IdK:
         case VectorIdK:
+          if (st_lookup(t->attr.name) == -1)
+          /* not yet in table, error */
+            symbolError(t, "rule 1 - undeclared symbol");
+          else
+          /* already in table, so ignore location,
+             add line number of use only */
+            st_add_lineno(t->attr.name, t->lineno);
+          break;
         case CallK:
           if (st_lookup(t->attr.name) == -1)
           /* not yet in table, error */
-            symbolError(t, "undeclared symbol");
+            symbolError(t, "rule 5 - undeclared function");
           else
           /* already in table, so ignore location,
              add line number of use only */
@@ -140,9 +149,11 @@ static void insertNode( TreeNode *t) {
       switch (t->kind.decl) {
         case FuncK:
           funcName = t->attr.name;
+          if (strcmp(funcName, "main") == 0)
+            main_count++;
           if (st_lookup_top(funcName) >= 0) {
           /* already in table, so it's an error */
-            symbolError(t, "function already declared");
+            symbolError(t, "rule 7 - function already declared");
             break;
           }
           st_insert(funcName, t->lineno, addLocation(), t);
@@ -163,7 +174,7 @@ static void insertNode( TreeNode *t) {
             char *name;
 
             if (t->child[0]->attr.type == VOID) {
-              symbolError(t, "variable should have non-void type");
+              symbolError(t, "rule 3 - variable should have non-void type");
               break;
             }
 
@@ -194,7 +205,7 @@ static void insertNode( TreeNode *t) {
         if (t->kind.param == NonVectorParamK)
           t->type = Integer;
         else
-          symbolError(t, "symbol already declared for current scope");
+          symbolError(t, "rule 4 - symbol already declared for current scope");
       }
       break;
     default:
@@ -278,17 +289,16 @@ static void checkNode(TreeNode *t) {
             typeError(t->child[0], "while test has void value");
           break;
         case ReturnK: {
-            const TreeNode *funcDecl =
-              st_bucket(funcName)->treeNode;
+            const TreeNode *funcDecl = st_bucket(funcName)->treeNode;
             const ExpType funcType = funcDecl->type;
             const TreeNode *expr = t->child[0];
 
-            if (funcType == Void &&
+            if ((funcType == Void) &&
                 (expr != NULL && expr->type != Void)) {
               typeError(t, "expected no return value");
-              //ValueReturned = TRUE;
-            } else if (funcType == Integer &&
-                (expr == NULL || expr->type == Void)) {
+            }
+            else if ((funcType == Integer) &&
+                     (expr == NULL || expr->type == Void)) {
               typeError(t, "expected return value");
             }
           }
@@ -299,16 +309,16 @@ static void checkNode(TreeNode *t) {
       break;
     case ExpK:
       switch (t->kind.exp) {
-        case AssignK:
-          if (t->child[0]->type == IntegerArray)
-          /* no value can be assigned to array variable */
-            typeError(t->child[0], "assignment to array variable");
-          else if (t->child[1]->type == Void)
-          /* r-value cannot have void type */
-            typeError(t->child[0], "assignment of void value");
-          else
-            t->type = t->child[0]->type;
-          break;
+        // case AssignK:
+        //   if (t->child[0]->type == IntegerArray)
+        //   /* no value can be assigned to array variable */
+        //     typeError(t->child[0], "rule 2 - assignment to array variable");
+        //   else if (t->child[1]->type == Void)
+        //   /* r-value cannot have void type */
+        //     typeError(t->child[0], "rule 2 - assignment of void value");
+        //   else
+        //     t->type = t->child[0]->type;
+        //   break;
         case OpK: {
             ExpType leftType, rightType;
             TokenType op;
@@ -319,18 +329,18 @@ static void checkNode(TreeNode *t) {
 
             if (leftType == Void ||
                 rightType == Void)
-              typeError(t, "two operands should have non-void type");
+              typeError(t, "rule 2 - two operands should have non-void type");
             else if (leftType == IntegerArray &&
                      rightType == IntegerArray)
-              typeError(t, "not both of operands can be array");
+              typeError(t, "rule 2 - not both of operands can be array");
             else if (op == MINUS &&
                      leftType == Integer &&
                      rightType == IntegerArray)
-              typeError(t, "invalid operands to binary expression");
+              typeError(t, "rule 2 - invalid operands to binary expression");
             else if ((op == TIMES || op == OVER) &&
                      (leftType == IntegerArray ||
                       rightType == IntegerArray))
-              typeError(t, "invalid operands to binary expression");
+              typeError(t, "rule 2 - invalid operands to binary expression");
             else
               t->type = Integer;
           }
@@ -351,9 +361,9 @@ static void checkNode(TreeNode *t) {
             if (t->kind.exp == VectorIdK) {
               if (symbolDecl->kind.decl  != VectorVarK &&
                   symbolDecl->kind.param != VectorParamK)
-                typeError(t, "expected array symbol");
+                typeError(t, "rule 2 - expected array symbol");
               else if (t->child[0]->type != Integer)
-                typeError(t, "index expression should have integer type");
+                typeError(t, "rule 2 - index expression should have integer type");
               else
                 t->type = Integer;
             }
@@ -384,12 +394,12 @@ static void checkNode(TreeNode *t) {
               /* the number of arguments does not match to
                  that of parameters */
                 typeError(arg, "the number of parameters is wrong");
-              /*else if (arg->type == IntegerArray &&
+              else if (arg->type == IntegerArray &&
                   param->type != IntegerArray)
                 typeError(arg,"expected non-array value");
               else if (arg->type == Integer &&
                   param->type == IntegerArray)
-                typeError(arg,"expected array value");*/
+                typeError(arg,"expected array value");
               else if (arg->type == Void)
                 typeError(arg, "void value cannot be passed as an argument");
               else {  // no problem!
@@ -401,10 +411,10 @@ static void checkNode(TreeNode *t) {
               break;
             }
 
-            if (arg == NULL && param != NULL)
-            /* the number of arguments does not match to
-               that of parameters */
-              typeError(t->child[0], "the number of parameters is wrong");
+           if (arg == NULL && param != NULL)
+           /* the number of arguments does not match to
+              that of parameters */
+             typeError(t, "the number of parameters is wrong");
 
             t->type = funcDecl->type;
           }
@@ -425,4 +435,6 @@ void typeCheck(TreeNode *syntaxTree) {
   sc_push(globalScope);
   traverse(syntaxTree, beforeCheckNode, checkNode);
   sc_pop();
+  if (main_count == 0)
+    printf("rule 6 - main function not declared");
 }
