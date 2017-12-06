@@ -84,7 +84,7 @@ type        : INT
               }
             | VOID
               {
-                $$ = newExpNode(TypeNameK);
+                $$ = newTypeNode(TypeNameK);
                 $$->attr.type = VOID;
               }
             ;
@@ -106,10 +106,9 @@ func_decl   : type save_name
 
 params      : params_list { $$ = $1; }
             | VOID
-            {
-              $$ = newTypeNode(TypeNameK);
-              $$->attr.type = VOID;
-            }
+              {
+                $$ = NULL;
+              }
             ;
 
 params_list : params_list COMMA param
@@ -241,11 +240,15 @@ var         : save_name
                 $$ = newExpNode(IdK);
                 $$->attr.name = savedName;
               }
-            | save_name LBRACKET expression RBRACKET
+            | save_name
               {
                 $$ = newExpNode(VectorIdK);
                 $$->attr.name = savedName;
-                $$->child[0] = $3;
+              }
+              LBRACKET expression RBRACKET
+              {
+                $$ = $2;
+                $$->child[0] = $4;
               }
             ;
 
@@ -345,18 +348,20 @@ fact        : LPAREN expression RPAREN { $$ = $2; }
               }
             ;
 
-call_func   : save_name LPAREN RPAREN
+call_func   : save_name
               {
                 $$ = newExpNode(CallK);
                 $$->attr.name = savedName;
-                $$->child[0] = NULL;
               }
-            | save_name LPAREN arg_list RPAREN
+              LPAREN args RPAREN
               {
-                $$ = newExpNode(CallK);
-                $$->attr.name = savedName;
-                $$->child[0] = $3;
+                $$ = $2;
+                $$->child[0] = $4;
               }
+            ;
+
+args        : arg_list { $$ = $1; }
+            | /* empty */ { $$ = NULL; }
             ;
 
 arg_list    : arg_list COMMA expression

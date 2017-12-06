@@ -1,4 +1,4 @@
-/* gdc com erro semantico - variável não declarada */
+/* gdc sem erro semantico */
 
 /* teste de função com parâmetros e corpo sem declarações */
 int gdc (int u, int v)
@@ -28,6 +28,7 @@ void main(void)
    int x;
    int y;
    int u;
+   int i;
    int v[10];
 
    /* chamadas de funções */
