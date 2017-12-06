@@ -94,7 +94,7 @@ static void nullProc(TreeNode *t) {
 }
 
 static void symbolError(TreeNode *t, char *message) {
-  fprintf(listing, "Symbol error at line %d: %s\n", t->lineno, message);
+  fprintf(listing, "line %d: %s\n", t->lineno, message);
   Error = TRUE;
 }
 
@@ -245,7 +245,7 @@ void buildSymtab(TreeNode *syntaxTree) {
 }
 
 static void typeError(TreeNode *t, char *message) {
-  fprintf(listing, "Type error at line %d: %s\n", t->lineno,message);
+  fprintf(listing, "line %d: %s\n", t->lineno,message);
   Error = TRUE;
 }
 
@@ -436,5 +436,5 @@ void typeCheck(TreeNode *syntaxTree) {
   traverse(syntaxTree, beforeCheckNode, checkNode);
   sc_pop();
   if (main_count == 0)
-    printf("rule 6 - main function not declared");
+    typeError(syntaxTree, "rule 6 - main function not declared");
 }
