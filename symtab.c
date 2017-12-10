@@ -42,6 +42,7 @@ Scope sc_top(void) {
 }
 
 void sc_pop(void) {
+  // printf("pop %s\n", sc_top()->funcName);
   --nScopeStack;
 }
 
@@ -50,6 +51,7 @@ int addLocation(void) {
 }
 
 void sc_push(Scope scope) {
+  // printf("push %s\n", scope->funcName);
   scopeStack[nScopeStack] = scope;
   location[nScopeStack++] = 0;
 }
@@ -128,6 +130,21 @@ int st_lookup_top(char *name) {
       l = l->next;
     if (l != NULL)
       return l->memloc;
+    break;
+  }
+  return -1;
+}
+
+int st_lookup_top_func(char *name) {
+  int h = hash(name);
+  Scope sc = scopeStack[0];
+  while(sc) {
+    BucketList l = sc->hashTable[h];
+    while ((l != NULL) && (strcmp(name, l->name) != 0))
+      l = l->next;
+    if (l != NULL && l->treeNode->nodekind == DeclK && l->treeNode->kind.decl == FuncK) {
+      return l->memloc;
+    }
     break;
   }
   return -1;

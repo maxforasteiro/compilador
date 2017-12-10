@@ -1,5 +1,5 @@
 /* gdc com erro semantico - nome de variável duplicado com função */
-
+int x;
 /* teste de função com parâmetros e corpo sem declarações */
 int gdc (int u, int v)
 {

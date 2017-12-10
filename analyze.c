@@ -187,10 +187,12 @@ static void insertNode( TreeNode *t) {
               t->type = IntegerArray;
             }
 
-            if (st_lookup_top(name) < 0)
-              st_insert(name, t->lineno, addLocation(), t);
-            else
+            if (st_lookup_top(name) >= 0)
               symbolError(t, "symbol already declared for current scope");
+            else if (st_lookup_top_func(name) >= 0)
+              symbolError(t, "function already declared with symbol name");
+            else
+              st_insert(name, t->lineno, addLocation(), t);
           }
           break;
         default:
@@ -372,6 +374,11 @@ static void checkNode(TreeNode *t) {
           }
           break;
         case CallK: {
+            if (st_lookup(t->attr.name) == -1){
+              typeError(t, "rule 5 - undeclared function");
+              break;
+            }
+
             const char *callingFuncName = t->attr.name;
             const TreeNode *funcDecl =
                 st_bucket(callingFuncName)->treeNode;
